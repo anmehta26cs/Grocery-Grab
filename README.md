@@ -14,6 +14,14 @@ To install Grocery Grab, clone the repository and run the following command to i
 
 ``` pip install -r requirements.txt ```
 
+As of now, Grocery Grab can only be deployed locally. To set up the database, run the following commands:
+
+``` sqlite3 grocerygrab.db ```
+
+``` .read schema.sql ```
+
+``` .exit ```
+
 From the same directory, run the following command to start the server:
 
 ``` flask run ```
