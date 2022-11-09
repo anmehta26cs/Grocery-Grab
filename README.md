@@ -1,4 +1,8 @@
 # Grocery-Grab
+> NOTE: This project is still in development. The following is a list of features that are currently being worked on. 
+- [x] AWS Deployment
+- [x] Link Sharing
+- [x] Group Synchronization
 
 ## Description
 
