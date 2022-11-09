@@ -31,9 +31,9 @@ Session(app)
 db = SQL("sqlite:///froshims.db")
 
 """
-.schema | CREATE TABLE registrants (id INTEGER, username TEXT NOT NULL, hash TEXT NOT NULL, PRIMARY KEY(id));
-* | SELECT * FROM registrants;
-
+.schema
+CREATE TABLE groups (groupID INTEGER, groupName TEXT NOT NULL, PRIMARY KEY(groupID));
+CREATE TABLE users (userID INTEGER, username TEXT NOT NULL, hash TEXT NOT NULL, userGroup INTEGER, FOREIGN KEY(userGroup) REFERENCES groups(groupID), PRIMARY KEY(userID));
 """
 
 @app.route('/login', methods=['GET', 'POST'])
