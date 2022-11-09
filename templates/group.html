@@ -5,21 +5,13 @@
 {% endblock %}
 
 {% block main %}
-<h1>your groups</h1>
-<ol class="list-group list-group-numbered">
-    <li class="list-group-item d-flex justify-content-between align-items-start">
-      <div class="ms-2 me-auto">
-        <div class="fw-bold">Roommates</div>
-        Dani, Samik, and 1 other
-      </div>
-      <span class="badge bg-primary rounded-pill">14</span>
-    </li>
-    <li class="list-group-item d-flex justify-content-between align-items-start">
-      <div class="ms-2 me-auto">
-        <div class="fw-bold">Family</div>
-        Roshan, Mom, Dad, and 1 other
-      </div>
-      <span class="badge bg-primary rounded-pill">7</span>
-    </li>
-  </ol>
+    <p>Group Name</p>
+    <p>{{ group_name }}</p>
+    <p>Group Members</p>
+    {% for member in members %}
+        <p>{{ member["username"] }}</p>
+    {% endfor %}
+    <form action="/leave" method="post">
+        <button class="btn btn-primary" type="submit">Leave Group</button>
+    </form>
 {% endblock %}

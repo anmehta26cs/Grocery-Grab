@@ -1,14 +1,14 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Join
+    Create
 {% endblock %}
 
 {% block main %}
-    <form action="/join" method="post">
+    <form action="/create" method="post">
         <div class="form-group">
             <input autocomplete="off" autofocus class="form-control" name="groupname" placeholder="Group Name" type="text">
         </div>
-        <button class="btn btn-primary" type="submit">Join Group</button>
+        <button class="btn btn-primary" type="submit">Create Group</button>
     </form>
 {% endblock %}

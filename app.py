@@ -59,7 +59,7 @@ def login():
             return apology("invalid username and/or password", 403)
 
         # Remember which user has logged in
-        session["user_id"] = rows[0]["id"]
+        session["user_id"] = rows[0]["userID"]
 
         # Redirect user to home page
         return redirect("/")
@@ -114,26 +114,95 @@ def register():
 @app.route("/")
 @login_required
 def index():
-    user = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    user = db.execute("SELECT * FROM users WHERE userID = ?", session["user_id"])
     return render_template("index.html", user=user[0]["username"])
 
 @app.route("/group")
 @login_required
-def groups():
-    user = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
-    return render_template("group.html", user=user[0]["username"])
+def group():
+    user = db.execute("SELECT * FROM users WHERE userID = ?", session["user_id"])
+    group_id = user[0]["userGroup"]
+    if not group_id:
+        return apology("You are not in a group", 403)
+    
+    data = db.execute("SELECT groupName FROM groups WHERE groupID = ?", group_id)
+    group_name = data[0]["groupName"]
+    members = db.execute("SELECT * FROM users WHERE userGroup = ? AND userID != ?", group_id, session["user_id"])
+    return render_template("group.html", group_name=group_name, members=members)
 
-@app.route("/join")
+@app.route("/join", methods=["GET", "POST"])
 @login_required
 def join():
-    user = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
-    return render_template("join.html", user=user[0]["username"])
+    if request.method == "POST":
+        group = request.form.get("groupname")
+
+        # Ensure group name was submitted
+        if not group:
+            return apology("must provide group name", 403)
+        
+        # Get groupID
+        data = db.execute("SELECT groupID FROM groups WHERE groupName = ?", group)
+
+        # Ensure group exists
+        if not data:
+            return apology("group does not exist", 403)
+        
+        groupID = data[0]["groupID"]
+        # Add user to group
+        db.execute("UPDATE users SET userGroup = ? WHERE userID = ?", groupID, session["user_id"])
+
+        return redirect("/group")
+    else:
+        return render_template("join.html")
+
+@app.route("/leave", methods=["POST"])
+@login_required
+def leave():
+    db.execute("UPDATE users SET userGroup = NULL WHERE userID = ?", session["user_id"])
+    return redirect("/group")
+
+@app.route("/create", methods=["GET", "POST"])
+@login_required
+def create():
+    if request.method == "POST":
+        group = request.form.get("groupname")
+
+        # Ensure group name was submitted
+        if not group:
+            return apology("must provide group name", 403)
+        
+        # Query database for group name, should only yield one row
+        rows = db.execute("SELECT * FROM groups WHERE groupName = ?", group)
+
+        # Ensure that group name does not match another
+        if rows:
+            return apology("group name already exists", 403)
+        
+        # Add group to groups table
+        db.execute("INSERT INTO groups (groupName) VALUES (?)", group)
+
+        # Get groupID
+        data = db.execute("SELECT groupID FROM groups WHERE groupName = ?", group)
+        groupID = data[0]["groupID"]
+
+        # Add user to group
+        db.execute("UPDATE users SET userGroup = ? WHERE userID = ?", groupID, session["user_id"])
+
+        return redirect("/group")
+    else:
+        return render_template("create.html")
 
 @app.route("/profile")
 @login_required
 def profile():
-    user = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
-    return render_template("profile.html", user=user[0]["username"])
+    user = db.execute("SELECT * FROM users WHERE userID = ?", session["user_id"])
+    username = user[0]["username"]
+    groupID = user[0]["userGroup"]
+    if not groupID:
+        return render_template("profile.html", username=username, group="None")
+    data = db.execute("SELECT groupName FROM groups WHERE groupID = ?", groupID)
+    group = data[0]["groupName"]
+    return render_template("profile.html", username=username, group=group)
 
 def errorhandler(e):
     """Handle error"""
