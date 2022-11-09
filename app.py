@@ -105,11 +105,16 @@ def register():
         print("GET")
         return render_template("register.html")
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-    user = db.execute("SELECT * FROM users WHERE userID = ?", session["user_id"])
-    return render_template("index.html", user=user[0]["username"])
+    if request.method == "POST":
+        # TODO: Add new item to database
+        user = db.execute("SELECT * FROM users WHERE userID = ?", session["user_id"])
+        return render_template("index.html", user=user[0]["username"])
+    else:
+        user = db.execute("SELECT * FROM users WHERE userID = ?", session["user_id"])
+        return render_template("index.html", user=user[0]["username"])
 
 @app.route("/group")
 @login_required

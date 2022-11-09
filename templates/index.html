@@ -5,5 +5,8 @@
 {% endblock %}
 
 {% block main %}
-    {{ user }}
+    <p>hello, {{ user }}</p>
+    <form action="/" method="post">
+        <button class="btn btn-primary" type="submit">Add To List!</button>
+    </form>
 {% endblock %}
